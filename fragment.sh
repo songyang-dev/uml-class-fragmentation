@@ -1,21 +1,56 @@
 #!/bin/bash
 
-# Edit this path to your plantuml
-plantuml="~/Documents/Libs/JavaLib/plantuml.jar"
+shopt -s expand_aliases
 
-if [ $# -ne 1 ]
-then
-    echo "Usage: ./fragment.sh ecore-file"
+# Edit this path to your plantuml
+alias plantuml="java -jar ~/Documents/Libs/JavaLib/plantuml.jar"
+
+if [ $# -ne 3 ] && [ $# -ne 1 ]; then
+    echo "Usage: ./fragment.sh ecore-file [--parallelize number-of-cores]"
     exit 1
 fi
 
+# Paths where this script is
+DIR="${BASH_SOURCE%/*}"
+
+# Parallelization controls
+parallelize=False
+max_jobs=0
+if [ $# -eq 3 ]; then
+    parallelize=True
+    max_jobs=$3
+fi
+
 # Executes the fragmentation algorithm
-python fragment.py "$1"
+python "$DIR"/fragment.py "$1"
 
 # Render
 name=$(basename "$1")
-for file in "${name%.ecore}"_*.ecore
-do
-    python ecore2plant.py "$file" > "${file%.ecore}.plantuml"
-    java -jar $plantuml "${file%.ecore}.plantuml"
-done
+folder=$(dirname "$1")
+function render(){
+    python "$DIR"/ecore2plant.py "$folder/$1" >"$folder/${1%.ecore}.plantuml"
+    plantuml "$folder/${1%.ecore}.plantuml"
+}
+
+# Sequential
+if [ "$parallelize" == "False" ]; then
+    for file in "$folder/${name%.ecore}"_*.ecore; do
+        render "$file"
+    done
+
+# Parallelized
+# https://unix.stackexchange.com/questions/103920/parallelize-a-bash-for-loop#216475
+else
+    N=$max_jobs
+    (
+        for file in "$folder/${name%.ecore}"_*.ecore; do
+            ((i = i % N))
+            ((i++ == 0)) && wait
+            render "$file" &
+        done
+    )
+fi
+
+# Render original file
+python "$DIR"/ecore2plant.py "$1" >"${1%.ecore}.plantuml"
+plantuml "$folder/${1%.ecore}.plantuml"

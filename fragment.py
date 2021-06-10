@@ -46,6 +46,7 @@ in order to get a natural language description of the part.
 Estimated fragment count per model is the sum of the number of classes/interfaces and
 the number of relations.
 """    
+import copy
 
 def parse_args():
     import sys
@@ -81,7 +82,7 @@ def main():
     for index, c in enumerate(classes):
         name = f"{os.path.splitext(ecoreFile)[0]}"
 
-        new_package = Ecore.EPackage(name=name, nsURI=root.nsURI, nsPrefix=root.nsPrefix)
+        new_package = Ecore.EPackage(name=root.name, nsURI=root.nsURI, nsPrefix=root.nsPrefix)
         
         attributes_only = Ecore.EClass(name=c.name)
         for attribute in c.eStructuralFeatures:
@@ -99,19 +100,22 @@ def main():
             if type(relation) is Ecore.EReference and relation.is_reference:
 
                 name = f"{os.path.splitext(ecoreFile)[0]}"
-                new_package = Ecore.EPackage(name=name, nsURI=root.nsURI, nsPrefix=root.nsPrefix)
+                new_package = Ecore.EPackage(name=root.name, nsURI=root.nsURI, nsPrefix=root.nsPrefix)
 
                 # Create empty classes
                 source_class = Ecore.EClass(name=c.name)
                 destination_class = Ecore.EClass(name=relation.eType.name)
 
                 # Add the relation
-                source_class.eStructuralFeatures.append(Ecore.EReference(relation.name, destination_class))
+                relation.eType = destination_class
+                source_class.eStructuralFeatures.append(relation)
 
                 # Set up serialization
                 new_package.eClassifiers.extend([source_class, destination_class])
                 save(new_package, f"{name}_rel{relation_count}.ecore")
                 relation_count = relation_count + 1
 
+    print(relation_count, "Relations")
+    
 if __name__ == "__main__":
     main()
