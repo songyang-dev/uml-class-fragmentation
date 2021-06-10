@@ -1,0 +1,6 @@
+.vscode/
+*.ecore
+*.xmi
+*.plantuml
+*.png
+*.json
