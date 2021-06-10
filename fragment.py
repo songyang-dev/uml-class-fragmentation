@@ -1,6 +1,6 @@
 
 # Ecore file format IO
-from typing import Iterator, List
+from typing import List
 from pyecore.resources import ResourceSet, URI, global_registry
 import pyecore.ecore as Ecore  # We get a reference to the Ecore metamodle implem.
 from pyecore.resources.json import JsonResource
@@ -77,6 +77,7 @@ def main():
 
     import os
 
+    # class fragments
     for index, c in enumerate(classes):
         name = f"{os.path.splitext(ecoreFile)[0]}"
 
@@ -84,6 +85,27 @@ def main():
         new_package.eClassifiers.extend([c])
 
         save(new_package, f"{name}_class{index}.ecore")
+
+    relation_count = 0
+    for c in classes:
+
+        for relation in c.eStructuralFeatures:
+            if type(relation) is Ecore.EReference and relation.is_reference:
+
+                name = f"{os.path.splitext(ecoreFile)[0]}"
+                new_package = Ecore.EPackage(name=name, nsURI=root.nsURI, nsPrefix=root.nsPrefix)
+
+                # Create empty classes
+                source_class = Ecore.EClass(name=c.name)
+                destination_class = Ecore.EClass(name=relation.eType.name)
+
+                # Add the relation
+                source_class.eStructuralFeatures.append(Ecore.EReference(relation.name, destination_class))
+
+                # Set up serialization
+                new_package.eClassifiers.extend([source_class, destination_class])
+                save(new_package, f"{name}_rel{relation_count}.ecore")
+                relation_count = relation_count + 1
 
 if __name__ == "__main__":
     main()
