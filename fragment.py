@@ -82,7 +82,13 @@ def main():
         name = f"{os.path.splitext(ecoreFile)[0]}"
 
         new_package = Ecore.EPackage(name=name, nsURI=root.nsURI, nsPrefix=root.nsPrefix)
-        new_package.eClassifiers.extend([c])
+        
+        attributes_only = Ecore.EClass(name=c.name)
+        for attribute in c.eStructuralFeatures:
+            if type(attribute) is Ecore.EAttribute:
+                attributes_only.eStructuralFeatures.append(attribute)
+
+        new_package.eClassifiers.append(attributes_only)
 
         save(new_package, f"{name}_class{index}.ecore")
 
