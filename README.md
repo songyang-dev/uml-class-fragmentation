@@ -12,4 +12,21 @@ Required packages and software are
 * Bash
 
 ## Getting started
-This repo is meant to be run using the `./fragment.sh ecore-file` command. Inside this script, you **must** edit the variable `plantuml` to a path pointing to the location of the plantuml jar.
+This repo is meant to be run using the `./fragment.sh ecore-file` command. Inside this script, you **must** edit the variable `plantuml` to a path pointing to the location of the plantuml jar. The fragmentation are stored in the folder of the ecore files.
+
+After the fragmentation is complete, you may use `python create_sqlite3.py directory-of-fragments` to generate a SQLite3 database of the models and its fragments. Here are the schema.
+
+```sql
+CREATE TABLE models (
+        name TEXT PRIMARY KEY,
+        classes INTEGER,
+        relations INTEGER
+    );
+
+CREATE TABLE fragments (
+        kind TEXT,
+        id INTEGER,
+        model TEXT,
+        FOREIGN KEY(model) REFERENCES models(name)
+    );
+```
