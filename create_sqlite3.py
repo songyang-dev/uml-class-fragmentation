@@ -47,7 +47,7 @@ for file in glob.glob(directory_of_frags + "/*.png"):
     if "_class" in file or "_rel" in file:
         continue
 
-    name = os.path.splitext(file)[0]
+    name = os.path.basename(file).split('.')[0]
     class_count = len(glob.glob(directory_of_frags + f"/{name}_class*.png"))
     rel_count = len(glob.glob(directory_of_frags + f"/{name}_rel*.png"))
     
@@ -62,7 +62,7 @@ for file in glob.glob(directory_of_frags + "/*.png"):
 
 # fragments
 for file in glob.glob(directory_of_frags + "/*_class*.png"):
-    name = os.path.splitext(file)[0]
+    name = os.path.basename(file).split('.')[0]
     tokenized = name.split("_class")
 
     assert len(tokenized) == 2
@@ -80,7 +80,7 @@ for file in glob.glob(directory_of_frags + "/*_class*.png"):
         """, rel_frag)
 
 for file in glob.glob(directory_of_frags + "/*_rel*.png"):
-    name = os.path.splitext(file)[0]
+    name = os.path.basename(file).split('.')[0]
     tokenized = name.split("_rel")
 
     assert len(tokenized) == 2
