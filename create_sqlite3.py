@@ -32,8 +32,9 @@ cur.execute(
 cur.execute(
     """CREATE TABLE IF NOT EXISTS fragments (
         kind TEXT,
-        id INTEGER,
+        number INTEGER,
         model TEXT,
+        unique_id INTEGER PRIMARY KEY AUTOINCREMENT,
         FOREIGN KEY(model) REFERENCES models(name)
     );""")
 
@@ -71,12 +72,12 @@ for file in glob.glob(directory_of_frags + "/*_class*.png"):
 
     rel_frag = {
         "kind": "class",
-        "id": id,
+        "number": id,
         "model": model
     }
     cur.execute(
-        """INSERT INTO fragments VALUES (
-            :kind, :id, :model);
+        """INSERT INTO fragments (kind, number, model) VALUES (
+            :kind, :number, :model);
         """, rel_frag)
 
 for file in glob.glob(directory_of_frags + "/*_rel*.png"):
@@ -93,7 +94,7 @@ for file in glob.glob(directory_of_frags + "/*_rel*.png"):
         "model": model
     }
     cur.execute(
-        """INSERT INTO fragments VALUES (
+        """INSERT INTO fragments (kind, number, model) VALUES (
             :kind, :id, :model);
         """, rel_frag)
 
