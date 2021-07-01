@@ -25,8 +25,9 @@ CREATE TABLE models (
 
 CREATE TABLE fragments (
         kind TEXT,
-        id INTEGER,
+        number INTEGER,
         model TEXT,
+        unique_id INTEGER PRIMARY KEY AUTOINCREMENT,
         FOREIGN KEY(model) REFERENCES models(name)
     );
 ```
