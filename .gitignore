@@ -5,6 +5,8 @@
 *.png
 *.json
 
+__pycache__/
+
 *.db
 sample/
 zipped/
