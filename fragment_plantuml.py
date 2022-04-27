@@ -5,13 +5,12 @@ import os
 import subprocess
 from sys import argv
 
-import inquire
-import uml
+from . import inquire
 
 
 def generate_json_from_plantuml(filename: str):
 
-    return_code = subprocess.call(['node', 'plantuml-parser.js', filename])
+    return_code = subprocess.call(["node", "plantuml-parser.js", filename])
 
     if return_code != 0:
 
@@ -20,6 +19,7 @@ def generate_json_from_plantuml(filename: str):
 
 def fragment(uml_model_path: str):
 
+    model_name = os.path.basename(uml_model_path.removesuffix(".plantuml"))
     json_file = uml_model_path.removesuffix(".plantuml") + ".json"
     if not os.path.isfile(json_file):
         generate_json_from_plantuml(uml_model_path)
@@ -57,9 +57,13 @@ def fragment(uml_model_path: str):
                 association += f" : {name}"
 
             relation_fragment = "@startuml\n!theme plain\n{}\n@enduml".format(
-                association)
+                association
+            )
 
-            with open(os.path.join(OUT_LOCATION, f"{uml_model.package_name}_rel{rel_index}.plantuml"), "w") as out_file:
+            with open(
+                os.path.join(OUT_LOCATION, f"{model_name}_rel{rel_index}.plantuml"),
+                "w",
+            ) as out_file:
                 out_file.write(relation_fragment)
                 rel_index += 1
 
@@ -75,7 +79,10 @@ def fragment(uml_model_path: str):
 
         class_fragment += "\n}\n@enduml"
 
-        with open(os.path.join(OUT_LOCATION, f"{uml_model.package_name}_class{index}.plantuml"), "w") as out_file:
+        with open(
+            os.path.join(OUT_LOCATION, f"{model_name}_class{index}.plantuml"),
+            "w",
+        ) as out_file:
             out_file.write(class_fragment)
 
 

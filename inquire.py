@@ -12,7 +12,7 @@ from pyecore.resources import ResourceSet
 from pyecore.utils import dispatch
 import pyecore.ecore as ecore
 
-import uml
+from . import uml
 
 SOURCE_DIR = "C:\\Users\\songy\\Documents\\My Documents\\UDEM\\master thesis\\uml data\\database\\analysis\\"
 
@@ -287,8 +287,7 @@ def get_json_uml(filename: str):
 
         elif len(split_cardinality) != 2:
             raise Warning(
-                "Unexpected cardinality, {}".format(
-                    relation["leftCardinality"])
+                "Unexpected cardinality, {}".format(relation["leftCardinality"])
             )
         else:
             name, cardinality = split_cardinality
